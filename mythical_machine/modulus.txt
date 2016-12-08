@@ -1,0 +1,9 @@
+100 030123 # Set register 0 to value 123
+101 031002 # Set register 1 to value 002
+102 042000 # Set register 2 to register 0
+103 082001 # Divide register 2 by register 1
+104 043002 # Set register 3 to register 2
+105 073001 # Multiply register 3 by register 1
+106 044000
+107 064003
+108 000000
