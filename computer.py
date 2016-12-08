@@ -15,10 +15,19 @@ __module__      = ""
 class Word:
     def __init__(self, arch, bits=0b0000):
         self.arch = arch
-        self.bits = bits # Our full data as an integer
+        self._bits = bits # Our full data as an integer
 
     @property
-    def instruction(self):#or inst?
+    def bits(self):
+        return self._bits
+
+    @bits.setter
+    def bits(self, bits):
+        assert bits < self.arch ** 4
+        self._bits = bits
+
+    @property
+    def inst(self):#or instruction?
         """Return first half(instruction) of data as an integer"""
         return int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
 
@@ -39,10 +48,14 @@ class RAM:
 
 class CPU:
     def __init__(self, arch):
+
+        self.ram = RAM(arch)
+
         self.arch = arch
         self.registers = [Word(self.arch) for i in range(self.arch // 2)] # Have half architecture as number of registers
         self.counter = self.registers[-1] # Use last register as counter
-        self.inst_set = (
+        self.iReg    = self.registers[-2] # Second to last register as instructional register
+        self.iSet = (
                 self.nop,
                 self.load,
                 self.store,
@@ -50,9 +63,17 @@ class CPU:
                 self.sub,
                 self.mul,
                 self.div,
+                self.nop, # Cuz 4-bit calc skips this for SOME reason
                 self.print,
                 self.input,
                 )
+
+    def fetch(self):
+        self.iReg.bits = self.ram.data[self.counter.bits].bits
+
+    def exec(self):
+        self.iSet[self.iReg.inst](self.iReg.data)
+        self.counter
 
     # And now, the instruction sets
     def nop(self, data):
@@ -77,7 +98,7 @@ class CPU:
         pass
 
     def print(self, data):
-        pass
+        print('yo')
 
     def input(self, data):
         pass
