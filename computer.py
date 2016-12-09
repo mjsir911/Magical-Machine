@@ -113,7 +113,6 @@ class CPU:
         self.iReg.bits = self.ram[self.counter].bits
 
     def exec(self):
-        print(self.iReg.inst)
         self.iSet[self.iReg.inst](self.iReg.data, self.iReg.regs)
         self.counter
 
@@ -125,14 +124,19 @@ class CPU:
         memory   = self.ram[data]
         register = self.registers[regs]
 
-        #print('copying {} to {}'.format(memory, register))
         register.bits = memory.bits
 
     def store(self, data, regs):
-        pass
+        memory   = self.ram[data]
+        register = self.registers[regs]
+
+        memory.bits = register.bits
 
     def add(self, data, regs):
-        pass
+        memory   = self.ram[data]
+        register = self.registers[regs]
+
+        memory.bits = register.bits
 
 
     def sub(self, data, regs):
