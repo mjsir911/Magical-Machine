@@ -113,8 +113,8 @@ class CPU:
         self.iReg.bits = self.ram[self.counter].bits
 
     def exec(self):
-        memory   = self.ram[data]
-        register = self.registers[regs]
+        memory   = self.ram[self.iReg.data]
+        register = self.registers[self.iReg.regs]
         self.iSet[self.iReg.inst](memory, register)
         self.counter
 
