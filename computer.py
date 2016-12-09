@@ -39,6 +39,7 @@ class Word(int):# I just really wanted this to inherit int
     @bits.setter
     def bits(self, bits):
         assert bits < (2 ** self.arch) ** 2
+        assert type(bits) == type(int)
         self._bits = bits
 
     @property
@@ -72,12 +73,15 @@ class Memory(tuple):
 class CPU:
     def __init__(self, arch):
 
-        self.ram = Memory(arch)
-
         self.arch = arch
+
+        self._memory = (ceil(log(arch/2, 2)))
+
+        self.ram = Memory(self.arch, 2 ** (self.arch - self._memory))
+
         #register_count = int((2 * arch - int(log(arch // 2, 2)) + 1) ** 1/4) + 1
-        amount = 2 ** (ceil(log(arch/2, 2)))
-        self.registers = Memory(self.arch, amount)
+        self.registers = Memory(self.arch, 2 ** self._memory)
+
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
@@ -97,6 +101,7 @@ class CPU:
         self.iReg.bits = self.ram[self.counter].bits
 
     def exec(self):
+        print(self.iReg.inst)
         self.iSet[self.iReg.inst](self.iReg.data)
         self.counter
 
@@ -113,11 +118,11 @@ class CPU:
         return 0
 
     def load(self, data):
-        address1 = int(format(data, '0{}b'.format(self.arch * 2))[:self.arch], 2)
-        address2 = int(format(data, '0{}b'.format(self.arch * 2))[self.arch:], 2)
+        memory = self.ram[int(format(data, '0{}b'.format(self.arch * 2))[:self.arch - self._memory], 2)]
+        register = self.registers[int(format(data, '0{}b'.format(self.arch * 2))[self._memory:], 2)]
 
-        self.address(address2).bits = self.address(address1).bits
-
+        print('copying {} to {}'.format(memory, register))
+        register.bits = memory.bits
 
     def store(self, data):
         pass
