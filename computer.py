@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from math import log, ceil
+
 __appname__     = ""
 __author__      = "Marco Sirabella"
 __copyright__   = ""
@@ -53,7 +55,8 @@ class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
     def __new__(cls, arch, amount = 0):
         if not amount:
-            amount = 2 ** arch
+            #amount = 2 ** (arch - int(log(arch // 2, 2))) The same but not
+            amount = 2 ** (arch - ceil(log(arch/2, 2)))
         return super(Memory, cls).__new__(cls,
                 (Word(arch) for i in range(amount)))
 
@@ -72,7 +75,9 @@ class CPU:
         self.ram = Memory(arch)
 
         self.arch = arch
-        self.registers = Memory(self.arch, amount=self.arch//2)
+        #register_count = int((2 * arch - int(log(arch // 2, 2)) + 1) ** 1/4) + 1
+        amount = 2 ** (ceil(log(arch/2, 2)))
+        self.registers = Memory(self.arch, amount)
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
@@ -96,10 +101,9 @@ class CPU:
         self.counter
 
     def address(self, data):
-        amount_ram = len(self.ram) - len(self.registers)
-        if data < amount_ram:
+        if data < len(self.ram):
             return self.ram[data]
-        elif amount_ram + len(self.registers) - 2 > data >= amount_ram:
+        elif len(self.ram) + len(self.registers) - 2 > data >= len(self.ram):
             return self.registers[data - len(self.ram)]
         else:
             assert False
