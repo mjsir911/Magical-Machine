@@ -51,9 +51,11 @@ class Word(int):# I just really wanted this to inherit int
 
 class RAM(tuple):
     """A device containing many words of data(architecture squared)"""
-    def __new__(cls, arch):
+    def __new__(cls, arch, amount = 0):
+        if not amount:
+            amount = arch ** 2
         return super(RAM, cls).__new__(cls,
-                (Word(arch) for i in range(arch ** 2 // 2)))
+                (Word(arch) for i in range(amount)))
 
     def __init__(self, arch):
         self._arch = arch
@@ -70,7 +72,7 @@ class CPU:
         self.ram = RAM(arch)
 
         self.arch = arch
-        self.registers = [Word(self.arch) for i in range(self.arch // 2)] # Have half architecture as number of registers
+        self.registers = RAM(self.arch, self.arch // 2)
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
@@ -93,18 +95,32 @@ class CPU:
         self.iSet[self.iReg.inst](self.iReg.data)
         self.counter
 
+    def address(self, data):
+        amount_ram = len(self.ram) - len(self.registers)
+        if data < amount_ram:
+            return self.ram[data]
+        elif amount_ram + len(self.registers) - 2 > data >= amount_ram:
+            return self.registers[data - len(self.ram)]
+        else:
+            assert False
+
     # And now, the instruction sets
     def nop(self, data):
         return 0
 
     def load(self, data):
-        pass
+        address1 = int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
+        address2 = int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
+
+        self.address(address2).bits = self.address(address1).bits
+
 
     def store(self, data):
         pass
 
     def add(self, data):
         pass
+
 
     def sub(self, data):
         pass
