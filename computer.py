@@ -23,11 +23,12 @@ class Word(int):# I just really wanted this to inherit int
     def __init__(self, arch, bits=0b0000):
         super().__init__()
         self.arch = arch
+        self._memory = (ceil(log(arch/2, 2)))
         self._bits = bits # Our full data as an integer
 
     def __repr__(self):
         #return repr(self.inst + " | " + self.data)
-        return repr("{}W{}".format(self.inst, self.data))
+        return repr("{}W{}W{}".format(self.inst, self.data, self.regs))
 
     def __str__(self):
         return str("{}W{}".format(self.inst, self.data))
@@ -39,25 +40,35 @@ class Word(int):# I just really wanted this to inherit int
     @bits.setter
     def bits(self, bits):
         assert bits < (2 ** self.arch) ** 2
-        assert type(bits) == type(int)
+        assert type(bits) == type(int())
         self._bits = bits
+
+    @property
+    def _str_bits(self):
+        return format(self.bits, '0{}b'.format(self.arch * 2))
 
     @property
     def inst(self):#or instruction?
         """Return first half(instruction) of data as an integer"""
-        return int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
+        #return int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
+        return int(self._str_bits[:self.arch - self._memory], 2)
 
     @property
     def data(self):
         """Return second half(data) of data as an integer"""
-        return int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
+        #return int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
+        return int(self._str_bits[self.arch - self._memory : self.arch * 2 - self._memory], 2)
+
+    @property
+    def regs(self):
+        """Returns register of data as integer"""
+        return int(self._str_bits[self.arch * 2 - self._memory:], 2)
 
 class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
     def __new__(cls, arch, amount = 0):
         if not amount:
-            #amount = 2 ** (arch - int(log(arch // 2, 2))) The same but not
-            amount = 2 ** (arch - ceil(log(arch/2, 2)))
+            amount = 2 ** arch
         return super(Memory, cls).__new__(cls,
                 (Word(arch) for i in range(amount)))
 
@@ -77,7 +88,8 @@ class CPU:
 
         self._memory = (ceil(log(arch/2, 2)))
 
-        self.ram = Memory(self.arch, 2 ** (self.arch - self._memory))
+        #self.ram = Memory(self.arch, 2 ** (self.arch - self._memory))
+        self.ram = Memory(self.arch, 2 ** self.arch)
 
         #register_count = int((2 * arch - int(log(arch // 2, 2)) + 1) ** 1/4) + 1
         self.registers = Memory(self.arch, 2 ** self._memory)
@@ -102,46 +114,38 @@ class CPU:
 
     def exec(self):
         print(self.iReg.inst)
-        self.iSet[self.iReg.inst](self.iReg.data)
+        self.iSet[self.iReg.inst](self.iReg.data, self.iReg.regs)
         self.counter
 
-    def memory(self, data):
-        obj = self.ram[int(format(data, '0{}b'.format(self.arch * 2))[:self.arch - self._memory], 2)]
-        return obj
-
-    def register(self, data):
-        obj = self.registers[int(format(data, '0{}b'.format(self.arch * 2))[self._memory:], 2)]
-        return obj
-
     # And now, the instruction sets
-    def nop(self, data):
+    def nop(self, data, regs):
         return 0
 
-    def load(self, data):
-        memory   = self.memory(data)
-        register = self.register(data)
+    def load(self, data, regs):
+        memory   = self.ram[data]
+        register = self.registers[regs]
 
         #print('copying {} to {}'.format(memory, register))
         register.bits = memory.bits
 
-    def store(self, data):
+    def store(self, data, regs):
         pass
 
-    def add(self, data):
+    def add(self, data, regs):
         pass
 
 
-    def sub(self, data):
+    def sub(self, data, regs):
         pass
 
-    def mul(self, data):
+    def mul(self, data, regs):
         pass
 
-    def div(self, data):
+    def div(self, data, regs):
         pass
 
-    def print(self, data):
+    def print(self, data, regs):
         print('yo')
 
-    def input(self, data):
+    def input(self, data, regs):
         pass
