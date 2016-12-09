@@ -49,12 +49,12 @@ class Word(int):# I just really wanted this to inherit int
         """Return second half(data) of data as an integer"""
         return int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
 
-class RAM(tuple):
+class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
     def __new__(cls, arch, amount = 0):
         if not amount:
             amount = arch ** 2
-        return super(RAM, cls).__new__(cls,
+        return super(Memory, cls).__new__(cls,
                 (Word(arch) for i in range(amount)))
 
     def __init__(self, arch, amount = 0):
@@ -69,10 +69,10 @@ class RAM(tuple):
 class CPU:
     def __init__(self, arch):
 
-        self.ram = RAM(arch)
+        self.ram = Memory(arch)
 
         self.arch = arch
-        self.registers = RAM(self.arch, amount=self.arch//2)
+        self.registers = Memory(self.arch, amount=self.arch//2)
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
