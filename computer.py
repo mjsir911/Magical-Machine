@@ -30,7 +30,8 @@ class Word(int):# I just really wanted this to inherit int
         return repr("{}W{}W{}".format(self.inst, self.data, self.regs))
 
     def __str__(self):
-        return str("{}W{}W{}".format(self.inst, self.data, self.regs))
+        #return str("{}W{}W{}".format(self.inst, self.data, self.regs))
+        return format(self.bits, '0{}b'.format(self.arch * 2))
 
     def __bool__(self):
         return bool(bits)
@@ -48,26 +49,26 @@ class Word(int):# I just really wanted this to inherit int
         assert type(bits) == type(int())
         self._bits = bits
 
-    @property
-    def _str_bits(self):
-        return format(self.bits, '0{}b'.format(self.arch * 2))
+    #@property
+    #def _str_bits(self):
+        #return format(self.bits, '0{}b'.format(self.arch * 2))
 
     @property
     def inst(self):#or instruction?
         """Return first half(instruction) of data as an integer"""
         #return int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
-        return int(self._str_bits[:self.arch - self._memory], 2)
+        return int(str(self)[:self.arch - self._memory], 2)
 
     @property
     def data(self):
         """Return second half(data) of data as an integer"""
         #return int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
-        return int(self._str_bits[self.arch - self._memory : self.arch * 2 - self._memory], 2)
+        return int(str(self)[self.arch - self._memory : self.arch * 2 - self._memory], 2)
 
     @property
     def regs(self):
         """Returns register of data as integer"""
-        return int(self._str_bits[self.arch * 2 - self._memory:], 2)
+        return int(str(self)[self.arch * 2 - self._memory:], 2)
 
 class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
