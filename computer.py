@@ -31,10 +31,13 @@ class Word(int):# I just really wanted this to inherit int
         return repr("{}W{}W{}".format(self.inst, self.data, self.regs))
 
     def __str__(self):
-        return str("{}W{}".format(self.inst, self.data))
+        return str("{}W{}W{}".format(self.inst, self.data, self.regs))
 
     def __bool__(self):
         return bool(bits)
+
+    #def __add__(self, other):
+        #return Word(self.arch, self.bits + other)
 
     @property
     def bits(self):
@@ -42,7 +45,7 @@ class Word(int):# I just really wanted this to inherit int
 
     @bits.setter
     def bits(self, bits):
-        assert bits < (2 ** self.arch) ** 2
+        assert 0 <= bits < (2 ** self.arch) ** 2
         assert type(bits) == type(int())
         self._bits = bits
 
@@ -113,13 +116,13 @@ class CPU:
                 )
 
     def fetch(self):
-        self.iReg.bits = self.ram[self.counter].bits
+        self.iReg.bits = self.ram[self.counter.bits].bits
 
     def exec(self):
         memory   = self.ram[self.iReg.data]
         register = self.registers[self.iReg.regs]
         self.iSet[self.iReg.inst](memory, register)
-        self.counter
+        self.counter.bits = self.counter.bits + 1
 
     # And now, the instruction sets
     def nop(self, mem, reg):
@@ -141,10 +144,10 @@ class CPU:
         reg.bits *= mem.bits
 
     def div(self, mem, reg):
-        pass
+        reg.bits = reg.bits // mem.bits
 
     def print(self, mem, reg):
         print(mem.bits)
 
     def input(self, mem, reg):
-        pass
+        mem.bits = int(input())
