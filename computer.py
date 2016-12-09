@@ -105,23 +105,23 @@ class CPU:
         self.iSet[self.iReg.inst](self.iReg.data)
         self.counter
 
-    def address(self, data):
-        if data < len(self.ram):
-            return self.ram[data]
-        elif len(self.ram) + len(self.registers) - 2 > data >= len(self.ram):
-            return self.registers[data - len(self.ram)]
-        else:
-            assert False
+    def memory(self, data):
+        obj = self.ram[int(format(data, '0{}b'.format(self.arch * 2))[:self.arch - self._memory], 2)]
+        return obj
+
+    def register(self, data):
+        obj = self.registers[int(format(data, '0{}b'.format(self.arch * 2))[self._memory:], 2)]
+        return obj
 
     # And now, the instruction sets
     def nop(self, data):
         return 0
 
     def load(self, data):
-        memory = self.ram[int(format(data, '0{}b'.format(self.arch * 2))[:self.arch - self._memory], 2)]
-        register = self.registers[int(format(data, '0{}b'.format(self.arch * 2))[self._memory:], 2)]
+        memory   = self.memory(data)
+        register = self.register(data)
 
-        print('copying {} to {}'.format(memory, register))
+        #print('copying {} to {}'.format(memory, register))
         register.bits = memory.bits
 
     def store(self, data):
