@@ -113,43 +113,35 @@ class CPU:
         self.iReg.bits = self.ram[self.counter].bits
 
     def exec(self):
-        self.iSet[self.iReg.inst](self.iReg.data, self.iReg.regs)
+        memory   = self.ram[data]
+        register = self.registers[regs]
+        self.iSet[self.iReg.inst](memory, register)
         self.counter
 
     # And now, the instruction sets
-    def nop(self, data, regs):
+    def nop(self, mem, reg):
         return 0
 
-    def load(self, data, regs):
-        memory   = self.ram[data]
-        register = self.registers[regs]
+    def load(self, mem, reg):
+        reg.bits = mem.bits
 
-        register.bits = memory.bits
+    def store(self, mem, reg):
+        mem.bits = reg.bits
 
-    def store(self, data, regs):
-        memory   = self.ram[data]
-        register = self.registers[regs]
+    def add(self, mem, reg):
+        reg.bits += mem.bits
 
-        memory.bits = register.bits
+    def sub(self, mem, reg):
+        reg.bits -= mem.bits
 
-    def add(self, data, regs):
-        memory   = self.ram[data]
-        register = self.registers[regs]
+    def mul(self, mem, reg):
+        reg.bits *= mem.bits
 
-        memory.bits = register.bits
-
-
-    def sub(self, data, regs):
+    def div(self, mem, reg):
         pass
 
-    def mul(self, data, regs):
-        pass
+    def print(self, mem, reg):
+        print(mem.bits)
 
-    def div(self, data, regs):
-        pass
-
-    def print(self, data, regs):
-        print('yo')
-
-    def input(self, data, regs):
+    def input(self, mem, reg):
         pass
