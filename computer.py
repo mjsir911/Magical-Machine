@@ -33,6 +33,9 @@ class Word(int):# I just really wanted this to inherit int
     def __str__(self):
         return str("{}W{}".format(self.inst, self.data))
 
+    def __bool__(self):
+        return bool(bits)
+
     @property
     def bits(self):
         return self._bits
