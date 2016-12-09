@@ -36,7 +36,7 @@ class Word(int):# I just really wanted this to inherit int
 
     @bits.setter
     def bits(self, bits):
-        assert bits < self.arch ** 4
+        assert bits < (2 ** self.arch) ** 2
         self._bits = bits
 
     @property
@@ -53,7 +53,7 @@ class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
     def __new__(cls, arch, amount = 0):
         if not amount:
-            amount = arch ** 2
+            amount = 2 ** arch
         return super(Memory, cls).__new__(cls,
                 (Word(arch) for i in range(amount)))
 
@@ -109,8 +109,8 @@ class CPU:
         return 0
 
     def load(self, data):
-        address1 = int(format(self.bits, '0{}b'.format(self.arch * 2))[:self.arch], 2)
-        address2 = int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
+        address1 = int(format(data, '0{}b'.format(self.arch * 2))[:self.arch], 2)
+        address2 = int(format(data, '0{}b'.format(self.arch * 2))[self.arch:], 2)
 
         self.address(address2).bits = self.address(address1).bits
 
