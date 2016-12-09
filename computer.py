@@ -12,10 +12,23 @@ __email__       = "msirabel@gmail.com"
 __status__      = "Prototype"  # "Prototype", "Development" or "Production"
 __module__      = ""
 
-class Word:
+class Word(int):# I just really wanted this to inherit int
+    """You can get me by just viewing, but if you wanna set me do Word.bits = 4"""
+
+    def __new__(cls, arch, bits=0b0000):
+        return super(Word, cls).__new__(cls, bits)
+
     def __init__(self, arch, bits=0b0000):
+        super().__init__()
         self.arch = arch
         self._bits = bits # Our full data as an integer
+
+    def __repr__(self):
+        #return repr(self.inst + " | " + self.data)
+        return repr("{}W{}".format(self.inst, self.data))
+
+    def __str__(self):
+        return str("{}W{}".format(self.inst, self.data))
 
     @property
     def bits(self):
@@ -36,15 +49,20 @@ class Word:
         """Return second half(data) of data as an integer"""
         return int(format(self.bits, '0{}b'.format(self.arch * 2))[self.arch:], 2)
 
-class RAM:
+class RAM(tuple):
     """A device containing many words of data(architecture squared)"""
+    def __new__(cls, arch):
+        return super(RAM, cls).__new__(cls,
+                (Word(arch) for i in range(arch ** 2 // 2)))
+
     def __init__(self, arch):
-        self.arch = arch
-        self.data = [Word(self.arch) for i in range(self.arch ** 2 // 2)] # Should i half it so i can reference registers
+        self._arch = arch
 
     def reboot(self):
         """Wipe all values in ram and reinitialize"""
-        self.__init__(self.arch)
+        #self = self.__new__(type(self), self._arch)
+        for word in self:
+            word.magnet()
 
 class CPU:
     def __init__(self, arch):
@@ -69,7 +87,7 @@ class CPU:
                 )
 
     def fetch(self):
-        self.iReg.bits = self.ram.data[self.counter.bits].bits
+        self.iReg.bits = self.ram[self.counter].bits
 
     def exec(self):
         self.iSet[self.iReg.inst](self.iReg.data)
