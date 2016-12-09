@@ -85,7 +85,7 @@ class Memory(tuple):
             word.magnet()
 
 class CPU:
-    def __init__(self, arch):
+    def __init__(self, arch=8):
 
         self.arch = arch
 
