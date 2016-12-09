@@ -91,13 +91,9 @@ class CPU:
 
         self.arch = arch
 
-        self._memory = (ceil(log(arch/2, 2)))
-
-        #self.ram = Memory(self.arch, 2 ** (self.arch - self._memory))
         self.ram = Memory(self.arch, 2 ** self.arch)
 
-        #register_count = int((2 * arch - int(log(arch // 2, 2)) + 1) ** 1/4) + 1
-        self.registers = Memory(self.arch, 2 ** self._memory)
+        self.registers = Memory(self.arch, 2 ** (ceil(log(arch/2, 2))))
 
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
@@ -120,7 +116,7 @@ class CPU:
     def exec(self):
         memory   = self.ram[self.iReg.data]
         register = self.registers[self.iReg.regs]
-        self.iSet[self.iReg.inst](memory, register)
+        self.iSet[self.iReg.inst](memory.bits, register.bits)
         self.counter.bits = self.counter.bits + 1
 
     # And now, the instruction sets
@@ -128,25 +124,25 @@ class CPU:
         return 0
 
     def load(self, mem, reg):
-        reg.bits = mem.bits
+        reg = mem
 
     def store(self, mem, reg):
-        mem.bits = reg.bits
+        mem = reg
 
     def add(self, mem, reg):
-        reg.bits += mem.bits
+        reg += mem
 
     def sub(self, mem, reg):
-        reg.bits -= mem.bits
+        reg -= mem
 
     def mul(self, mem, reg):
-        reg.bits *= mem.bits
+        reg *= mem
 
     def div(self, mem, reg):
-        reg.bits = reg.bits // mem.bits
+        reg = reg // mem
 
     def print(self, mem, reg):
-        print(mem.bits)
+        print(mem)
 
     def input(self, mem, reg):
-        mem.bits = int(input())
+        mem = int(input())
