@@ -57,7 +57,7 @@ class RAM(tuple):
         return super(RAM, cls).__new__(cls,
                 (Word(arch) for i in range(amount)))
 
-    def __init__(self, arch):
+    def __init__(self, arch, amount = 0):
         self._arch = arch
 
     def reboot(self):
@@ -72,7 +72,7 @@ class CPU:
         self.ram = RAM(arch)
 
         self.arch = arch
-        self.registers = RAM(self.arch, self.arch // 2)
+        self.registers = RAM(self.arch, amount=self.arch//2)
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
