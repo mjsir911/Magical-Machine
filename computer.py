@@ -87,6 +87,23 @@ class Memory(tuple):
         for word in self:
             word.magnet()
 
+class ALU():
+    def __init__(self, parent, name, op):
+        self.self = parent
+        self.name = name
+        self.operator = op
+
+    def __repr__(self):
+        orig = super().__repr__()
+        #return '<unbound operator {} of {}>'.format(self.name, orig)
+        #return orig.replace('object', 'operator')\
+                #.replace('ALU', self.name.upper())
+        return '<bound operator ALU.{} of {}>'.format(self.name.upper(), repr(self.self))
+
+
+    def __call__(self, reg, mem):
+        reg.bits = int(self.operator(reg.bits, mem.bits))
+
 class CPU:
     def __init__(self, arch=8):
 
@@ -102,10 +119,10 @@ class CPU:
                 self.nop,
                 self.load,
                 self.store,
-                self.add,
-                self.sub,
-                self.mul,
-                self.div,
+                ALU(self, 'add', lambda r, m: r + m),
+                ALU(self, 'sub', lambda r, m: r - m),
+                ALU(self, 'mul', lambda r, m: r * m),
+                ALU(self, 'div', lambda r, m: r / m),
                 self.nop, # Cuz 4-bit calc skips this for SOME reason
                 self.print,
                 self.input,
