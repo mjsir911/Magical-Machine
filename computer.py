@@ -15,7 +15,6 @@ __status__      = "Prototype"  # "Prototype", "Development" or "Production"
 __module__      = ""
 
 class Word(int):# I just really wanted this to inherit int
-    """You can get me by just viewing, but if you wanna set me do Word.bits = 4"""
 
     def __new__(cls, arch, bits=0b0000):
         return super(Word, cls).__new__(cls, bits)
