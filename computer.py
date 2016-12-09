@@ -95,10 +95,8 @@ class ALU():
 
     def __repr__(self):
         orig = super().__repr__()
-        #return '<unbound operator {} of {}>'.format(self.name, orig)
-        #return orig.replace('object', 'operator')\
-                #.replace('ALU', self.name.upper())
-        return '<bound operator ALU.{} of {}>'.format(self.name.upper(), repr(self.self))
+        return '<bound operator ALU.{} of {}>'\
+                .format(self.name.upper(), repr(self.self))
 
 
     def __call__(self, reg, mem):
