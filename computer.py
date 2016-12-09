@@ -34,7 +34,7 @@ class Word(int):# I just really wanted this to inherit int
         return format(self.bits, '0{}b'.format(self.arch * 2))
 
     def __bool__(self):
-        return bool(bits)
+        return bool(self.bits)
 
     #def __add__(self, other):
         #return Word(self.arch, self.bits + other)
@@ -146,4 +146,4 @@ class CPU:
         print(mem)
 
     def input(self, mem, reg):
-        mem = int(input())
+        mem = int(input(), 0)
