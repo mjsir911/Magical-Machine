@@ -46,6 +46,7 @@ class Word(int):# I just really wanted this to inherit int
     @bits.setter
     def bits(self, bits):
         assert 0 <= bits < (2 ** self.arch) ** 2
+        #print(type(bits))
         assert type(bits) == type(int())
         self._bits = bits
 
@@ -87,20 +88,49 @@ class Memory(tuple):
         for word in self:
             word.magnet()
 
-class ALU():
-    def __init__(self, parent, name, op):
-        self.self = parent
+class Chip:
+    def __init__(self, name, lam):
+        #self.self = parent
         self.name = name
-        self.operator = op
+        self.function = lam
+        self.subname = 'object'
 
     def __repr__(self):
         orig = super().__repr__()
-        return '<bound operator ALU.{} of {}>'\
-                .format(self.name.upper(), repr(self.self))
-
+        name = type(self).__name__
+        #return '<bound operator ALU.{} of {}>'\
+                #.format(self.name.upper(), repr(self.self))
+        return orig.replace(name, '{}.{}'.format(name, self.name.upper()).replace('object', self.subname))
 
     def __call__(self, reg, mem):
-        reg.bits = int(self.operator(reg.bits, mem.bits))
+        reg.bits = self.function(reg.bits, mem.bits)
+
+class ALU(Chip):
+    def __init__(self, name, operator):
+        super().__init__(name, operator)
+        self.subname = 'operator'
+
+    def __call__(self, reg, mem):
+        reg.bits = int(self.function(reg.bits, mem.bits))
+
+class SIO(Chip):
+    def __init__(self, name, bus):
+        super().__init__(name, bus)
+        self.subname = 'serial'
+
+    def __call__(self, reg, mem):
+        #print(mem)
+        input = self.function(reg, mem)
+        #if input is not mem or input is not mem.bits:
+        if input is mem.bits:
+            print('output = reg')
+            output = reg
+        else:
+            output = mem
+
+        #print(output)
+        output.bits = input #Somehow function this works
+
 
 class CPU:
     def __init__(self, arch=8):
@@ -114,51 +144,24 @@ class CPU:
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
-                self.nop,
-                self.load,
-                self.store,
-                ALU(self, 'add', lambda r, m: r + m),
-                ALU(self, 'sub', lambda r, m: r - m),
-                ALU(self, 'mul', lambda r, m: r * m),
-                ALU(self, 'div', lambda r, m: r / m),
-                self.nop, # Cuz 4-bit calc skips this for SOME reason
-                self.print,
-                self.input,
+                            lambda r, m: 0,
+                SIO('load', lambda r, m: m.bits),
+                SIO('stor', lambda r, m: r.bits),
+                ALU('add',  lambda r, m: r + m),
+                ALU('sub',  lambda r, m: r - m),
+                ALU('mul',  lambda r, m: r * m),
+                ALU('div',  lambda r, m: r / m),
+                            lambda r, m: 0,
+                            # Cuz 4-bit calc skips this for SOME reason
+                            lambda r, m: print(m),
+                SIO('inpt', lambda r, m: int(input(), 0)),
                 )
 
     def fetch(self):
         self.iReg.bits = self.ram[self.counter.bits].bits
 
     def exec(self):
-        memory   = self.ram[self.iReg.data]
         register = self.registers[self.iReg.regs]
-        self.iSet[self.iReg.inst](memory.bits, register.bits)
+        memory   = self.ram[self.iReg.data]
+        self.iSet[self.iReg.inst](register, memory)
         self.counter.bits = self.counter.bits + 1
-
-    # And now, the instruction sets
-    def nop(self, mem, reg):
-        return 0
-
-    def load(self, mem, reg):
-        reg = mem
-
-    def store(self, mem, reg):
-        mem = reg
-
-    def add(self, mem, reg):
-        reg += mem
-
-    def sub(self, mem, reg):
-        reg -= mem
-
-    def mul(self, mem, reg):
-        reg *= mem
-
-    def div(self, mem, reg):
-        reg = reg // mem
-
-    def print(self, mem, reg):
-        print(mem)
-
-    def input(self, mem, reg):
-        mem = int(input(), 0)
