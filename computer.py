@@ -100,7 +100,12 @@ class Chip:
         name = type(self).__name__
         # return '<bound operator ALU.{} of {}>'\
         #         .format(self.name.upper(), repr(self.self))
-        return orig.replace(name, '{}.{}'.format(name, self.name.upper()).replace('object', self.subname))
+        return orig.replace(
+            name,
+            '{}.{}'.format(
+                name, self.name.upper()
+            )
+        ).replace('object', self.subname)
 
     def __call__(self, reg, mem):
         return self.function(reg.bits, mem.bits)
@@ -119,7 +124,7 @@ class ALU(Chip):
 class SIO(Chip):
     def __init__(self, name, bus):
         super().__init__(name, bus)
-        self.subname = 'serial'
+        self.subname = 'serial IO'
 
     def __call__(self, reg, mem):
         input, output = self.function(reg, mem)
@@ -141,7 +146,8 @@ class CPU:
         self.registers = Memory(self.arch, 2 ** (ceil(log(arch / 2, 2))))
 
         self.counter = self.registers[-1]  # Use last register as counter
-        self.iReg    = self.registers[-2]  # Second to last register as instructional register
+        self.iReg    = self.registers[-2]
+        # Second to last register as instructional register
         self.iSet = (
             Chip('nop', lambda r, m: (0)),
             SIO('load', lambda r, m: (m, r)),
@@ -165,4 +171,4 @@ class CPU:
         memory   = self.ram[self.iReg.data]
         self.counter.bits = self.counter.bits + 1
         self.iSet[self.iReg.inst](register, memory)
-        #return self.iSet[self.iReg.inst](register, memory)
+        # return self.iSet[self.iReg.inst](register, memory)
