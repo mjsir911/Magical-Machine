@@ -122,16 +122,11 @@ class SIO(Chip):
         self.subname = 'serial'
 
     def __call__(self, reg, mem):
-        # print(mem)
-        input = self.function(reg, mem)
-        # if input is not mem or input is not mem.bits:
-        if input is mem.bits:
-            # print('output = reg')
-            output = reg
-        else:
-            output = mem
+        input, output = self.function(reg, mem)
+        assert isinstance(output, Word)
+        if isinstance(input, Word):
+            input = input.bits
 
-        # print(output)
         output.bits = input  # Somehow function this works
 
 
@@ -147,18 +142,18 @@ class CPU:
         self.counter = self.registers[-1]  # Use last register as counter
         self.iReg    = self.registers[-2]  # Second to last register as instructional register
         self.iSet = (
-            Chip('nop', lambda r, m: 0),
-            SIO('load', lambda r, m: m.bits),
-            SIO('stor', lambda r, m: r.bits),
+            Chip('nop', lambda r, m: (0)),
+            SIO('load', lambda r, m: (m, r)),
+            SIO('stor', lambda r, m: (r, m)),
             # Mathematical
-            ALU('add', lambda r, m: r + m),
-            ALU('sub', lambda r, m: r - m),
-            ALU('mul', lambda r, m: r * m),
-            ALU('div', lambda r, m: r / m),
-            Chip'nop', lambda r, m: 0,),
+            ALU('add' , lambda r, m: (r + m)),
+            ALU('sub' , lambda r, m: (r - m)),
+            ALU('mul' , lambda r, m: (r * m)),
+            ALU('div' , lambda r, m: (r / m)),
+            Chip('nop', lambda r, m: (0)),
             # Cuz 4-bit calc skips this for SOME reason
             Chip('prn', lambda r, m: print(m)),
-            SIO('inpt', lambda r, m: int(input(), 0)),
+            SIO('inpt', lambda r, m: (int(input(), 0), m)),
         )
 
     def fetch(self):
