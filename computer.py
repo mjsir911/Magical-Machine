@@ -45,8 +45,9 @@ class Word(int):# I just really wanted this to inherit int
 
     @bits.setter
     def bits(self, bits):
-        assert 0 <= bits < (2 ** self.arch) ** 2
         #print(type(bits))
+        #print(bits)
+        assert 0 <= bits < (2 ** self.arch) ** 2
         assert type(bits) == type(int())
         self._bits = bits
 
@@ -93,7 +94,7 @@ class Chip:
         #self.self = parent
         self.name = name
         self.function = lam
-        self.subname = 'object'
+        self.subname = 'chip'
 
     def __repr__(self):
         orig = super().__repr__()
@@ -103,7 +104,8 @@ class Chip:
         return orig.replace(name, '{}.{}'.format(name, self.name.upper()).replace('object', self.subname))
 
     def __call__(self, reg, mem):
-        reg.bits = self.function(reg.bits, mem.bits)
+        #reg.bits = self.function(reg.bits, mem.bits)
+        self.function(reg.bits, mem.bits)
 
 class ALU(Chip):
     def __init__(self, name, operator):
@@ -123,7 +125,7 @@ class SIO(Chip):
         input = self.function(reg, mem)
         #if input is not mem or input is not mem.bits:
         if input is mem.bits:
-            print('output = reg')
+            #print('output = reg')
             output = reg
         else:
             output = mem
@@ -144,16 +146,16 @@ class CPU:
         self.counter = self.registers[-1] # Use last register as counter
         self.iReg    = self.registers[-2] # Second to last register as instructional register
         self.iSet = (
-                            lambda r, m: 0,
+                Chip('nop', lambda r, m: 0),
                 SIO('load', lambda r, m: m.bits),
                 SIO('stor', lambda r, m: r.bits),
                 ALU('add',  lambda r, m: r + m),
                 ALU('sub',  lambda r, m: r - m),
                 ALU('mul',  lambda r, m: r * m),
                 ALU('div',  lambda r, m: r / m),
-                            lambda r, m: 0,
+                Chip('nop', lambda r, m: 0,),
                             # Cuz 4-bit calc skips this for SOME reason
-                            lambda r, m: print(m),
+                Chip('prn', lambda r, m: print(m)),
                 SIO('inpt', lambda r, m: int(input(), 0)),
                 )
 
