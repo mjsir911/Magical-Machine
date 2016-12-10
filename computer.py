@@ -24,11 +24,18 @@ class Word(int):  # I just really wanted this to inherit int
         super().__init__()
         self.arch = arch
         self._memory = (ceil(log(arch / 2, 2)))
+        #
+        ## Format of input would be:
+        # Instruction: [:self.arch - self._memory}
+        # Register   : [self.arch - self._memory:self.arch * 2 - self._memory]
+        # Address    : [self.arch:]
+        ##
+        #
         self._bits = bits  # Our full data as an integer
 
     def __repr__(self):
         # return repr(self.inst + " | " + self.data)
-        return repr("{}W{}W{}".format(self.inst, self.data, self.regs))
+        return repr("{}W{}W{}".format(self.inst, self.regs, self.inst))
 
     def __str__(self):  # Not the best practice, but needed for below functions
         # return str("{}W{}W{}".format(self.inst, self.data, self.regs))
@@ -55,16 +62,16 @@ class Word(int):  # I just really wanted this to inherit int
         return int(str(self)[:self.arch - self._memory], 2)
 
     @property
-    def data(self):
-        """Return second half(data) of data as an integer"""
+    def regs(self):
+        """Returns register of data as integer"""
         return int(str(self)[
             self.arch     - self._memory:
             self.arch * 2 - self._memory
         ], 2)
 
     @property
-    def regs(self):
-        """Returns register of data as integer"""
+    def data(self):
+        """Return second half(data) of data as an integer"""
         return int(str(self)[self.arch * 2 - self._memory:], 2)
 
 

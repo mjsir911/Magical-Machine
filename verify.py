@@ -36,27 +36,27 @@ run(1)
 assert x.ram[0].bits == x.registers[0].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
 
-x.ram[2].bits = 0b0000100000000100
+x.ram[2].bits = 0b0000100000000001
 run(1)
 assert x.registers[0].bits == x.ram[1].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
 
-x.ram[3].bits = 0b0000111111111100
+x.ram[3].bits = 0b0000110011111111
 run(1)
 assert x.ram[0].bits + x.ram[255].bits == x.registers[0].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
 
-x.ram[4].bits = 0b0001001111111100
+x.ram[4].bits = 0b0001000011111111
 run(1)
 assert x.ram[0].bits == x.registers[0].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
 
-x.ram[5].bits = 0b0001011111111100
+x.ram[5].bits = 0b0001010011111111
 run(1)
 assert x.ram[0].bits * x.ram[255].bits == x.registers[0].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
 
-x.ram[6].bits = 0b0001101111111100
+x.ram[6].bits = 0b0001100011111111
 run(1)
 assert x.ram[0].bits == x.registers[0].bits, (
     '{}, {}'.format(x.ram[0].bits, x.registers[0].bits))
