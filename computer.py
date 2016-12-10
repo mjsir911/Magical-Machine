@@ -103,8 +103,7 @@ class Chip:
         return orig.replace(name, '{}.{}'.format(name, self.name.upper()).replace('object', self.subname))
 
     def __call__(self, reg, mem):
-        # reg.bits = self.function(reg.bits, mem.bits)
-        self.function(reg.bits, mem.bits)
+        return self.function(reg.bits, mem.bits)
 
 
 class ALU(Chip):
@@ -114,6 +113,7 @@ class ALU(Chip):
 
     def __call__(self, reg, mem):
         reg.bits = int(self.function(reg.bits, mem.bits))
+        return 0
 
 
 class SIO(Chip):
@@ -128,6 +128,7 @@ class SIO(Chip):
             input = input.bits
 
         output.bits = input  # Somehow function this works
+        return 0
 
 
 class CPU:
@@ -162,5 +163,5 @@ class CPU:
     def exec(self):
         register = self.registers[self.iReg.regs]
         memory   = self.ram[self.iReg.data]
-        self.iSet[self.iReg.inst](register, memory)
         self.counter.bits = self.counter.bits + 1
+        return self.iSet[self.iReg.inst](register, memory)
