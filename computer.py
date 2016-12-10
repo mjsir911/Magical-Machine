@@ -164,4 +164,5 @@ class CPU:
         register = self.registers[self.iReg.regs]
         memory   = self.ram[self.iReg.data]
         self.counter.bits = self.counter.bits + 1
-        return self.iSet[self.iReg.inst](register, memory)
+        self.iSet[self.iReg.inst](register, memory)
+        #return self.iSet[self.iReg.inst](register, memory)
