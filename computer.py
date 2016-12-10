@@ -35,7 +35,7 @@ class Word(int):  # I just really wanted this to inherit int
 
     def __repr__(self):
         # return repr(self.inst + " | " + self.data)
-        return repr("{}W{}W{}".format(self.inst, self.regs, self.inst))
+        return repr("{}W{}W{}".format(self.inst, self.regs, self.data))
 
     def __str__(self):  # Not the best practice, but needed for below functions
         # return str("{}W{}W{}".format(self.inst, self.data, self.regs))
@@ -52,7 +52,9 @@ class Word(int):  # I just really wanted this to inherit int
     def bits(self, bits):
         # print(type(bits))
         # print(bits)
-        assert 0 <= bits < (2 ** self.arch) ** 2
+        assert 0 <= bits < (2 ** self.arch) ** 2, (
+                '{} cannot fit inside this word'.format(bits)
+                )
         assert isinstance(bits, int)
         self._bits = bits
 
@@ -65,14 +67,13 @@ class Word(int):  # I just really wanted this to inherit int
     def regs(self):
         """Returns register of data as integer"""
         return int(str(self)[
-            self.arch     - self._memory:
-            self.arch * 2 - self._memory
+            self.arch - self._memory:self.arch
         ], 2)
 
     @property
     def data(self):
         """Return second half(data) of data as an integer"""
-        return int(str(self)[self.arch * 2 - self._memory:], 2)
+        return int(str(self)[self.arch:], 2)
 
 
 class Memory(tuple):
