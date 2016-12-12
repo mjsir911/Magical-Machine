@@ -52,6 +52,14 @@ class Word(int):  # I just really wanted this to inherit int
     def bits(self, bits):
         # print(type(bits))
         # print(bits)
+        min = 0
+        max = (1 << self.arch * 2) - 1
+
+        if min >= bits:
+            bits = -bits & (1 << self.arch) - 1 # Two's compliment
+        elif bits <= max :
+            bits = bits % max # Get overflow
+
         assert 0 <= bits < (1 << self.arch) ** 2, (
                 '{} cannot fit inside this word'.format(bits)
                 )
@@ -208,6 +216,6 @@ class CPU:
         # return self.iSet[self.iReg.inst](register, memory)
 
     def run(self, repeat=1): # Just for simplicities' sake
-        for num in repeat:
+        for num in range(repeat):
             self.fetch()
             self.exec()
