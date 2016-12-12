@@ -17,7 +17,7 @@ __module__      = ""
 
 x = computer.CPU(8)
 
-def run(num = 1):
+def run(num=1):
     for n in range(num):
         x.fetch()
         #print(x.iReg)
@@ -83,11 +83,11 @@ assert x.ram[0].bits * x.ram[253].bits == x.registers[0].bits, (
             x.registers[0].bits,
             )
         )
-x.ram[7].bits = 0b0000100000000000
-run(1)
+x.ram[8].bits = 0b0000100000000000 # reg 0 to ram 0
+run()
 
-x.ram[8].bits = 0b0001100011111101
-#x.ram[1].bits = 0b0001100000001010
+x.ram[9].bits = 0b0001100011111101
+run()
 assert x.ram[0].bits // x.ram[253].bits == x.registers[0].bits, (
         'DIV not working ({} // {} != {})'.format(
             x.ram[0].bits,
