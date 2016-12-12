@@ -143,6 +143,32 @@ class SIO(Chip):
         output.bits = input  # Somehow function this works
         return 0
 
+class KYC(Chip):
+    def __init__(self, name, null):
+        del null
+        del name
+        super().__init__('keyboard', False)
+        self.subname = 'peripheral'
+
+    # something like @classmethod
+    def _bord(self, char, len):
+        num = ord(char)
+        fstring = '0{}b'.format(len)
+        return format(num, fstring)
+
+
+    def __call__(self, reg, mem):
+        del reg
+        arch = len(str(mem)) // 2
+        while True:
+            inp = input()
+            inp = inp.replace(" ", "") # Get rid of spaces
+            inp += chr(0) # add a trailing null
+            inp = iter(inp) # turn into iterable
+            for first, last in zip(inp, inp):
+                first = self._bord(first, arch)
+                last = self._bord(last, arch)
+                print(str(first), str(last))
 
 class CPU:
     def __init__(self, arch=8):
@@ -180,3 +206,8 @@ class CPU:
         self.counter.bits = self.counter.bits + 1
         self.iSet[self.iReg.inst](register, memory)
         # return self.iSet[self.iReg.inst](register, memory)
+
+    def run(self, repeat=1): # Just for simplicities' sake
+        for num in repeat:
+            self.fetch()
+            self.exec()
