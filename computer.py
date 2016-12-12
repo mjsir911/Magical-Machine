@@ -52,7 +52,7 @@ class Word(int):  # I just really wanted this to inherit int
     def bits(self, bits):
         # print(type(bits))
         # print(bits)
-        assert 0 <= bits < (2 ** self.arch) ** 2, (
+        assert 0 <= bits < (1 << self.arch) ** 2, (
                 '{} cannot fit inside this word'.format(bits)
                 )
         assert isinstance(bits, int)
@@ -80,7 +80,7 @@ class Memory(tuple):
     """A device containing many words of data(architecture squared)"""
     def __new__(cls, arch, amount=0):
         if not amount:
-            amount = 2 ** arch
+            amount = 1 << arch
         return super(Memory, cls).__new__(
             cls,
             (Word(arch) for i in range(amount))
@@ -175,9 +175,9 @@ class CPU:
 
         self.arch = arch
 
-        self.ram = Memory(self.arch, 2 ** self.arch)
+        self.ram = Memory(self.arch, 1 << self.arch)
 
-        self.registers = Memory(self.arch, 2 ** (ceil(log(arch / 2, 2))))
+        self.registers = Memory(self.arch, 1 << (ceil(log(arch / 2, 2))))
 
         self.counter = self.registers[-1]  # Use last register as counter
         self.iReg    = self.registers[-2]
