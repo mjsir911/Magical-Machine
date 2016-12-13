@@ -6,39 +6,44 @@ store reg 2 to somewhere#1
 reg 1 = + somewhere#1
 store reg 1 to somewhere#2
 
-set address# to paddress#
-set bits# to pbits#
-set isetnum# to pisetnum#
+load pop_code# reg 2
+store reg2 #op_code#
 
-func train:
+load paddress# to reg 2
+
+set bits# to pbits#
+
+func-train:
+add one# to reg 2
+store reg 2 to address#
+
+load #op_code# to reg 1
+add one# to reg 1
+store reg 1 to #op_code#
+#op_code# (this is the line #op_code# refers to)(will be like load reg1 line#)
+store reg1 chr_code#
+
 load somewhere#2 to reg 1
-sub register by bits#
-cjump to address#
-load address# to reg 1
-add isetnum# to reg 1
-store reg 1 to address#
-load bits# to reg 1
-add isetnum# to reg 1
-store reg 1 to bits#
-:jump to top
+sub register by chr_code#
+cjump reg1 to address#
+:jump to top 
+
+func-train top-addr
 
 address# (address for first address)
-bits# (address for first bits)
-isetnum#
+chr_code# = 0
+pop_code# (bits = load reg1 #!address!#)
 
-paddress#
-pbits#
-pisetnum#
-
-
+paddress# (address for first address -1)
+pbits#(address for first bits -1)
 
 end of func train:
-set totale to opcode
+set grande totale to opcode
 
 load second half of aline (line - first half * 256)
 subtract from 48
 mult by 256
-add to grande total
+add to grande totale
 
 load #3 aline
 get first half by aline // 256
@@ -63,7 +68,7 @@ add 1 to #3
 jump to top
 addresses:
 jump-address(0000000000000000)
-1 (needed to add 1)
+one# (needed to add 1)
 end of block #2
 end of block #1
 end of func train addr
@@ -79,5 +84,19 @@ sub-bits:
 sub-opcode: 
 sub-address: c-address + 1
 sub-func:
+  load opcode
+  jump back to end of func train
+
+mul-bits:   
+mul-opcode: 
+mul-mulress: c-mulress + 1
+mul-func:
+  load opcode
+  jump back to end of func train
+
+div-bits:   
+div-opcode: 
+div-address: c-address + 1
+div-func:
   load opcode
   jump back to end of func train
