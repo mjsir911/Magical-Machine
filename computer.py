@@ -151,11 +151,10 @@ class SIO(Chip):
         output.bits = input  # Somehow function this works
         return 0
 
-class KYC(Chip):
-    def __init__(self, name, null):
-        del null
-        del name
-        super().__init__('keyboard', False)
+class KYC(SIO):
+    def __init__(self, ram):
+        super().__init__('keyboard', lambda r, m: (r, m))
+        self.ram = ram
         self.subname = 'peripheral'
 
     # something like @classmethod
@@ -168,8 +167,12 @@ class KYC(Chip):
     def __call__(self, reg, mem):
         del reg
         arch = len(str(mem)) // 2
+        ram = iter(self.ram[self.ram.index(mem):])
         while True:
-            inp = input()
+            try:
+                inp = input()
+            except KeyboardInterrupt:
+                break
             inp = inp.replace(" ", "") # Get rid of spaces
             inp += chr(0) # add a trailing null
             inp = iter(inp) # turn into iterable
@@ -177,6 +180,8 @@ class KYC(Chip):
                 first = self._bord(first, arch)
                 last = self._bord(last, arch)
                 print(str(first), str(last))
+                chrint = int(str(first) + str(last), 2)
+                super().__call__(chrint, next(ram))
 
 class CPU:
     def __init__(self, arch=8):
