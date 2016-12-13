@@ -14,6 +14,7 @@ __email__       = "msirabel@gmail.com"
 __status__      = "Prototype"  # "Prototype", "Development" or "Production"
 __module__      = ""
 
+#stop peppering assert
 
 class Word(int):  # I just really wanted this to inherit int
     from random import random # ask kevin about this
@@ -35,11 +36,12 @@ class Word(int):  # I just really wanted this to inherit int
         self._bits = bits  # Our full data as an integer
 
     def __repr__(self):
-        # return repr(self.inst + " | " + self.data)
         return repr("{}W{}W{}".format(self.inst, self.regs, self.data))
+        # use for custom repr
+        #return repr('0x' + format(self.bits, '0{}x'.format(self.arch//2)))
+        # use for hex
 
     def __str__(self):  # Not the best practice, but needed for below functions
-        # return str("{}W{}W{}".format(self.inst, self.data, self.regs))
         return format(self.bits, '0{}b'.format(self.arch * 2))
 
     def __bool__(self):
@@ -63,9 +65,8 @@ class Word(int):  # I just really wanted this to inherit int
         elif max <= bits :
             bits = bits % max # Get overflow
 
-        assert 0 <= bits < (1 << self.arch) ** 2, (
-                '{} cannot fit inside this word'.format(bits)
-                )
+        assert 0 <= bits < (1 << self.arch) ** 2, \
+                            ('{} cannot fit inside this word'.format(bits))
         assert isinstance(bits, int)
         self._bits = bits
 
@@ -87,7 +88,7 @@ class Word(int):  # I just really wanted this to inherit int
         return int(str(self)[self.arch:], 2)
 
     def magnet(self):
-        self.bits = int(self.random()) * 1 << self.arch
+        self.bits = int(random()) * 1 << self.arch
 
 
 class Memory(tuple):
@@ -97,8 +98,7 @@ class Memory(tuple):
             amount = 1 << arch
         return super(Memory, cls).__new__(
             cls,
-            (Word(arch) for i in range(amount))
-        )
+            (Word(arch) for i in range(amount)))
 
     def __init__(self, arch, amount=0):
         self._arch = arch
@@ -262,3 +262,6 @@ class CPU:
     def reset(self):
         for register in self.registers:
             register.bits = 0
+def main():
+    x = CPU()
+    pass
