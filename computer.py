@@ -241,7 +241,7 @@ class CPU:
             Chip('prn', lambda r, m: print(m)),
             SIO('inpt', lambda r, m: (int(input(), 0), m)),
             SIO('jump', lambda r, m: (m.data, self.registers[-1])),
-            SIO('ijmp', lambda r, m: (m.data, self.registers[-1]) if r.bits == 0 else (None, None)), # Gotta improve this
+            SIO('ijmp', lambda r, m: (m.data, self.registers[-1]) if r.bits == 0 else (None, None)), # Gotta improve this # Looks at memory cell m for data
         )
 
     def fetch(self):
