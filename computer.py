@@ -55,6 +55,8 @@ class Word(int):  # I just really wanted this to inherit int
         min = 0
         max = (1 << self.arch * 2) - 1
 
+        assert isinstance(bits, int)
+
         if min >= bits:
             bits = -bits & (1 << self.arch) - 1 # Two's compliment
         elif max <= bits :
@@ -96,6 +98,18 @@ class Memory(tuple):
 
     def __init__(self, arch, amount=0):
         self._arch = arch
+
+    def load(self, name):
+        """Load contents from file"""
+        file = open(name, 'r')
+        for num, line in enumerate(file.read().splitlines()):
+            self[num].bits = int(line.split()[0], 2)
+
+    def dump(self, name):
+        """Dump contents to file"""
+        file = open(name, 'w')
+        file.write('\n'.join(str(line) for line in self))
+        file.close()
 
     def reboot(self):
         """Wipe all values in ram and reinitialize"""
