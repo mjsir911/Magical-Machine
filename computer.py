@@ -16,6 +16,7 @@ __module__      = ""
 
 
 class Word(int):  # I just really wanted this to inherit int
+    from random import random # ask kevin about this
 
     def __new__(cls, arch, bits=0b0000):
         return super(Word, cls).__new__(cls, bits)
@@ -84,6 +85,9 @@ class Word(int):  # I just really wanted this to inherit int
     def data(self):
         """Return second half(data) of data as an integer"""
         return int(str(self)[self.arch:], 2)
+
+    def magnet(self):
+        self.bits = int(self.random()) * 1 << self.arch
 
 
 class Memory(tuple):
@@ -157,12 +161,13 @@ class SIO(Chip):
         self.subname = 'serial IO'
 
     def __call__(self, reg, mem):
+        #print(self)
         input, output = self.function(reg, mem)
-        if not input and not output:
+        if output is None:
             print('no')
             return 1
 
-        assert isinstance(output, Word)
+        assert isinstance(output, Word), 'output is {}'.format(type(output))
         if isinstance(input, Word):
             input = input.bits
 
@@ -197,7 +202,7 @@ class KYC(SIO):
                 except ValueError:
                     pass
                 else:
-                    continue # Repeat the loop
+                    continue # Repeat the loop Gotta ask kevin for better way to do this
 
             # Continue on acting like characters were used
 
@@ -236,9 +241,7 @@ class CPU:
             Chip('prn', lambda r, m: print(m)),
             SIO('inpt', lambda r, m: (int(input(), 0), m)),
             SIO('jump', lambda r, m: (m.data, self.registers[-1])),
-            SIO('ijmp', lambda r, m:\
-                (m.data, self.registers[-1]) if r.bits == 0
-                else (print('no'), False)), # Gotta improve this
+            SIO('ijmp', lambda r, m: (m.data, self.registers[-1]) if r.bits == 0 else (None, None)), # Gotta improve this
         )
 
     def fetch(self):
