@@ -158,6 +158,10 @@ class SIO(Chip):
 
     def __call__(self, reg, mem):
         input, output = self.function(reg, mem)
+        if not input and not output:
+            print('no')
+            return 1
+
         assert isinstance(output, Word)
         if isinstance(input, Word):
             input = input.bits
@@ -231,7 +235,9 @@ class CPU:
             # Cuz 4-bit calc skips this for SOME reason
             Chip('prn', lambda r, m: print(m)),
             SIO('inpt', lambda r, m: (int(input(), 0), m)),
-            SIO('jump', lambda r, m: (m.data, self.registers[-1]),
+            SIO('jump', lambda r, m: (m.data, self.registers[-1])),
+            SIO('ijmp', lambda r, m: (m.data, self.registers[-1])\
+                    if r.bits == 0 else (False, False)), # Gotta improve this
         )
 
     def fetch(self):
