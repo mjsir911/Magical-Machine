@@ -248,3 +248,7 @@ class CPU:
         for num in range(repeat):
             self.fetch()
             self.exec()
+
+    def reset(self):
+        for register in self.registers:
+            register.bits = 0
