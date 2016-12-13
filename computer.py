@@ -179,7 +179,6 @@ class KYC(SIO):
 
 
     def __call__(self, mem):
-        del reg
         arch = len(str(mem)) // 2
         ram = iter(self.ram[self.ram.index(mem):])
         while True:
