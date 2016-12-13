@@ -57,7 +57,7 @@ class Word(int):  # I just really wanted this to inherit int
 
         if min >= bits:
             bits = -bits & (1 << self.arch) - 1 # Two's compliment
-        elif bits <= max :
+        elif max <= bits :
             bits = bits % max # Get overflow
 
         assert 0 <= bits < (1 << self.arch) ** 2, (
@@ -164,7 +164,7 @@ class KYC(SIO):
         return format(num, fstring)
 
 
-    def __call__(self, reg, mem):
+    def __call__(self, mem):
         del reg
         arch = len(str(mem)) // 2
         ram = iter(self.ram[self.ram.index(mem):])
@@ -174,6 +174,16 @@ class KYC(SIO):
             except KeyboardInterrupt:
                 break
             inp = inp.replace(" ", "") # Get rid of spaces
+            if len(inp) == arch * 2:
+                try:
+                    super().__call__(int(inp, 2), next(ram))
+                except ValueError:
+                    pass
+                else:
+                    continue # Repeat the loop
+
+            # Continue on acting like characters were used
+
             inp += chr(0) # add a trailing null
             inp = iter(inp) # turn into iterable
             for first, last in zip(inp, inp):
