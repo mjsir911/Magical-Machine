@@ -1,0 +1,47 @@
+read first aline
+load to register
+add second aline // 256
+dupe reg
+
+sub register by 'add' bits
+cjump to add fun
+load dupe or add back 'add' bits
+sub register by 'sub' bits
+cjump to sub fun
+load dupe or add back 'sub' bits
+sub register by 'mul' bits
+cjump to mul fun
+load dupe or add back 'mul' bits
+sub register by 'div' bits
+cjump to div fun
+
+load second half of aline (line - first half * 256)
+subtract from 48
+mult by 256
+add to grande total
+
+load third aline
+get first half by aline // 256
+dupe
+div by 58
+if 0 jump past block
+  sub 55
+  mul by 8
+  add to grande totale
+get second half of aline
+dupe
+div by 58
+if 0 jump past block
+  sub 55
+  add to grande totale
+
+
+add one to top line
+jump to top
+
+add-bits:   0110000111001000
+add-opcode: 0000110000000000
+add-func:
+  load opcode
+  set totale to opcode
+  jump back to end of func train
