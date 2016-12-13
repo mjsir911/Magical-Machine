@@ -218,7 +218,7 @@ class CPU:
         self.counter = self.registers[-1]  # Use last register as counter
         self.iReg    = self.registers[-2]
         # Second to last register as instructional register
-        self.iSet = (
+        self.iSet = (#Everything in here needs to be callable with 2 args
             Chip('nop', lambda r, m: (0)),
             SIO('load', lambda r, m: (m, r)),
             SIO('stor', lambda r, m: (r, m)),
@@ -231,6 +231,7 @@ class CPU:
             # Cuz 4-bit calc skips this for SOME reason
             Chip('prn', lambda r, m: print(m)),
             SIO('inpt', lambda r, m: (int(input(), 0), m)),
+            SIO('jump', lambda r, m: (m.data, self.registers[-1]),
         )
 
     def fetch(self):
